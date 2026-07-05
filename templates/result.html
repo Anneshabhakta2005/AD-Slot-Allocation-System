@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+
+{% block title %}Schedule Results{% endblock %}
+{% block header_title %}Allocation Schedule Results{% endblock %}
+
+{% block content %}
+<!-- Overview Cards Row -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="glass-card p-3 border-start border-primary border-4">
+            <div class="text-secondary small">Optimized Revenue</div>
+            <div class="fs-3 fw-bold text-success" id="stat-revenue">${{ "{:,.2f}".format(metrics.total_revenue) }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="glass-card p-3 border-start border-success border-4">
+            <div class="text-secondary small">Scheduled Advertisements</div>
+            <div class="fs-3 fw-bold text-primary">{{ metrics.allocated_count }} / {{ stats.total_ads }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="glass-card p-3 border-start border-warning border-4">
+            <div class="text-secondary small">Unused Broadcasting Time</div>
+            <div class="fs-3 fw-bold text-warning">{{ metrics.total_unused_time }} / 720 mins</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="glass-card p-3 border-start border-info border-4">
+            <div class="text-secondary small">Algorithm Execution Time</div>
+            <div class="fs-3 fw-bold text-info">{{ "{:.4f}".format(metrics.execution_time_ms) }} ms</div>
+        </div>
+    </div>
+</div>
+
+<!-- Timeline Visual Representation -->
+<div class="glass-card p-4 mb-4">
+    <h3 class="card-heading mb-4"><i class="bi bi-clock-history text-primary me-2"></i>Slot Schedule Timeline</h3>
+    
+    <div class="timeline-slots-wrapper">
+        {% for slot_name, config in slot_config.items() %}
+            {% set slot_used = metrics.slot_utilization.get(slot_name, 0) %}
+            {% set slot_cap = config.capacity %}
+            {% set slot_unused = slot_cap - slot_used %}
+            {% set slot_pct = stats.slot_utilization_pct.get(slot_name, 0) %}
+            
+            <div class="slot-timeline-row mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="fw-bold fs-6 text-primary">{{ slot_name }} Slot <span class="text-muted small">({{ config.start_time }} - {{ config.end_time }})</span></span>
+                    <span class="small text-secondary">
+                        Utilization: <b class="text-success">{{ slot_pct }}%</b> ({{ slot_used }}/{{ slot_cap }} mins) | Unused: <b>{{ slot_unused }} mins</b>
+                    </span>
+                </div>
+                
+                <!-- Horizontal Bar -->
+                <div class="progress timeline-progress-bar rounded-3" style="height: 38px;">
+                    {% set current_offset = namespace(val=0) %}
+                    
+                    {% for ad in ads %}
+                        {% if ad.Status == 'Allocated' and ad.AllocatedSlot == slot_name %}
+                            {% set ad_width = (ad.Duration / slot_cap) * 100 %}
+                            
+                            <!-- Deterministic hue based on ad priority/hash -->
+                            {% set ad_hue = (ad.Priority * 36) % 360 %}
+                            
+                            <div class="progress-bar timeline-segment" 
+                                 role="progressbar" 
+                                 style="width: {{ ad_width }}%; background-color: hsl({{ ad_hue }}, 75%, 45%);"
+                                 data-bs-toggle="tooltip" 
+                                 data-bs-html="true"
+                                 title="<b>Ad ID:</b> {{ ad.AdvertisementID }}<br><b>Duration:</b> {{ ad.Duration }}m<br><b>Budget:</b> ${{ ad.Budget }}<br><b>Time:</b> {{ ad.AllocatedStartTime }}-{{ ad.AllocatedEndTime }}<br><b>Priority:</b> {{ ad.Priority }}">
+                                {{ ad.AdvertisementID }}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <!-- Unused Block -->
+                    {% if slot_unused > 0 %}
+                        {% set unused_width = (slot_unused / slot_cap) * 100 %}
+                        <div class="progress-bar timeline-segment-unused" 
+                             role="progressbar" 
+                             style="width: {{ unused_width }}%;"
+                             data-bs-toggle="tooltip"
+                             title="<b>Unused Capacity:</b> {{ slot_unused }} minutes">
+                            Unused ({{ slot_unused }}m)
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Detailed Table and Search controls -->
+<div class="glass-card p-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <h3 class="card-heading m-0"><i class="bi bi-list-stars text-primary me-2"></i>Detailed Campaigns Status</h3>
+        
+        <!-- Quick Export Buttons -->
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('download_csv') }}" class="btn btn-outline-success btn-sm px-3 rounded-pill" id="btn-export-csv">
+                <i class="bi bi-file-earmark-excel-fill me-1"></i> Export CSV
+            </a>
+            <a href="{{ url_for('report') }}" class="btn btn-outline-danger btn-sm px-3 rounded-pill" id="btn-download-pdf">
+                <i class="bi bi-file-earmark-pdf-fill me-1"></i> Download PDF
+            </a>
+        </div>
+    </div>
+    
+    <!-- Table Controls Toolbar -->
+    <div class="row g-3 mb-3">
+        <!-- Search -->
+        <div class="col-md-4">
+            <div class="input-group input-group-sm">
+                <span class="input-group-text bg-white bg-opacity-5 border-white border-opacity-10 text-secondary"><i class="bi bi-search"></i></span>
+                <input type="text" id="tableSearch" class="form-control bg-white bg-opacity-5 border-white border-opacity-10 text-white" placeholder="Search Campaign / Ad ID...">
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="col-md-3 col-6">
+            <select id="filterStatus" class="form-select form-select-sm bg-white bg-opacity-5 border-white border-opacity-10 text-secondary">
+                <option value="ALL">Status: All Campaigns</option>
+                <option value="Allocated">Status: Allocated</option>
+                <option value="Rejected">Status: Rejected</option>
+            </select>
+        </div>
+        
+        <div class="col-md-3 col-6">
+            <select id="filterSlot" class="form-select form-select-sm bg-white bg-opacity-5 border-white border-opacity-10 text-secondary">
+                <option value="ALL">Preferred Slot: All</option>
+                <option value="Morning">Morning</option>
+                <option value="Afternoon">Afternoon</option>
+                <option value="Evening">Evening</option>
+                <option value="PrimeTime">PrimeTime</option>
+            </select>
+        </div>
+        
+        <!-- Page Limits -->
+        <div class="col-md-2 text-md-end">
+            <select id="pageSize" class="form-select form-select-sm d-inline-block w-auto bg-white bg-opacity-5 border-white border-opacity-10 text-secondary">
+                <option value="10">10 Rows</option>
+                <option value="25" selected>25 Rows</option>
+                <option value="50">50 Rows</option>
+                <option value="100">100 Rows</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Campaigns Schedule Table -->
+    <div class="table-responsive border border-white border-opacity-10 rounded-3 mb-3">
+        <table class="table table-custom align-middle m-0" id="allocationTable">
+            <thead>
+                <tr>
+                    <th class="sortable" data-sort="AdvertisementID">Ad ID <i class="bi bi-arrow-down-up ms-1 small text-muted"></i></th>
+                    <th class="sortable" data-sort="Duration">Duration <i class="bi bi-arrow-down-up ms-1 small text-muted"></i></th>
+                    <th class="sortable" data-sort="Budget">Budget <i class="bi bi-arrow-down-up ms-1 small text-muted"></i></th>
+                    <th class="sortable" data-sort="Priority">Priority <i class="bi bi-arrow-down-up ms-1 small text-muted"></i></th>
+                    <th class="sortable" data-sort="PreferredSlot">Preferred Slot <i class="bi bi-arrow-down-up ms-1 small text-muted"></i></th>
+                    <th class="sortable" data-sort="AllocatedSlot">Allocated Slot <i class="bi bi-arrow-down-up ms-1 small text-muted"></i></th>
+                    <th>Broadcasting Interval</th>
+                    <th class="sortable" data-sort="Status">Status <i class="bi bi-arrow-down-up ms-1 small text-muted"></i></th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Programmatically populated by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination Footer -->
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
+        <div class="text-secondary small" id="tableInfo">
+            Showing 0 to 0 of 0 entries
+        </div>
+        <nav aria-label="Table Navigation">
+            <ul class="pagination pagination-sm m-0" id="tablePagination">
+                <!-- Programmatically populated by JavaScript -->
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Embed the raw json data for main.js to consume and render
+    const rawAdsData = {{ ads | tojson | safe }};
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        // Initialize table pagination, search and sorting logic
+        initAllocationTable(rawAdsData);
+    });
+</script>
+{% endblock %}

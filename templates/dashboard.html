@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+{% block header_title %}Analytics &amp; Performance Benchmarking{% endblock %}
+
+{% block content %}
+<!-- Overview Metrics Row -->
+<div class="row g-3 mb-4">
+    <!-- Stat 1 -->
+    <div class="col-6 col-lg-3">
+        <div class="glass-card p-3 d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-primary bg-opacity-10 text-primary d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; min-width: 48px;">
+                <i class="bi bi-wallet2 fs-4"></i>
+            </div>
+            <div>
+                <span class="text-secondary small d-block">Optimized Revenue</span>
+                <span class="fs-4 fw-extrabold text-success">${{ "{:,.2f}".format(metrics.total_revenue) }}</span>
+            </div>
+        </div>
+    </div>
+    <!-- Stat 2 -->
+    <div class="col-6 col-lg-3">
+        <div class="glass-card p-3 d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-success bg-opacity-10 text-success d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; min-width: 48px;">
+                <i class="bi bi-check-all fs-4"></i>
+            </div>
+            <div>
+                <span class="text-secondary small d-block">Allocated Campaigns</span>
+                <span class="fs-4 fw-bold text-primary">{{ stats.allocated_count }} / {{ stats.total_ads }}</span>
+            </div>
+        </div>
+    </div>
+    <!-- Stat 3 -->
+    <div class="col-6 col-lg-3">
+        <div class="glass-card p-3 d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-warning bg-opacity-10 text-warning d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; min-width: 48px;">
+                <i class="bi bi-hourglass-split fs-4"></i>
+            </div>
+            <div>
+                <span class="text-secondary small d-block">Unused Airtime</span>
+                <span class="fs-4 fw-bold text-warning">{{ metrics.total_unused_time }} mins</span>
+            </div>
+        </div>
+    </div>
+    <!-- Stat 4 -->
+    <div class="col-6 col-lg-3">
+        <div class="glass-card p-3 d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-info bg-opacity-10 text-info d-flex align-items-center justify-content-center" style="width: 48px; height: 48px; min-width: 48px;">
+                <i class="bi bi-stopwatch fs-4"></i>
+            </div>
+            <div>
+                <span class="text-secondary small d-block">Execution Speed</span>
+                <span class="fs-4 fw-bold text-info">{{ "{:.3f}".format(metrics.execution_time_ms) }} ms</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Secondary Statistics and Benchmarks Row -->
+<div class="row g-4 mb-4">
+    <!-- Secondary Stats Panel -->
+    <div class="col-lg-4">
+        <div class="glass-card p-4 h-100">
+            <h3 class="card-heading mb-4"><i class="bi bi-calculator text-primary me-2"></i>Dataset Statistics</h3>
+            
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex justify-content-between align-items-center border-bottom border-white border-opacity-5 pb-2">
+                    <span class="text-secondary">Average Budget / Ad</span>
+                    <span class="fw-bold">${{ "{:,.2f}".format(stats.avg_budget) }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center border-bottom border-white border-opacity-5 pb-2">
+                    <span class="text-secondary">Average Ad Duration</span>
+                    <span class="fw-bold">{{ "{:.2f}".format(stats.avg_duration) }} mins</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center border-bottom border-white border-opacity-5 pb-2">
+                    <span class="text-secondary">Highest Budget Ad</span>
+                    <span class="fw-bold text-success">${{ "{:,.2f}".format(stats.highest_budget) }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center border-bottom border-white border-opacity-5 pb-2">
+                    <span class="text-secondary">Lowest Budget Ad</span>
+                    <span class="fw-bold text-danger">${{ "{:,.2f}".format(stats.lowest_budget) }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center border-bottom border-white border-opacity-5 pb-2">
+                    <span class="text-secondary">Most Demanded Slot</span>
+                    <span class="fw-bold text-primary">{{ stats.most_requested_slot }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center pb-1">
+                    <span class="text-secondary">Most Profitable Slot</span>
+                    <span class="fw-bold text-warning">{{ stats.most_profitable_slot }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparative Table of Algorithms -->
+    <div class="col-lg-8">
+        <div class="glass-card p-4 h-100">
+            <h3 class="card-heading mb-3"><i class="bi bi-shield-shaded text-primary me-2"></i>Strategy Comparison Benchmark</h3>
+            <p class="text-secondary small mb-3">Performance of algorithms benchmarks calculated on the active loaded dataset:</p>
+            
+            <div class="table-responsive border border-white border-opacity-10 rounded-3">
+                <table class="table table-custom align-middle m-0 text-center">
+                    <thead>
+                        <tr>
+                            <th class="text-start">Algorithm Strategy</th>
+                            <th>Total Revenue</th>
+                            <th>Allocated Ads</th>
+                            <th>Rejected Ads</th>
+                            <th>Unused Time</th>
+                            <th>Runtime</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alg, data in comparisons.items() %}
+                            {% set is_active = (current_algorithm.lower() == alg.lower()) %}
+                            <tr class="{% if is_active %}table-active-row{% endif %}">
+                                <td class="text-start fw-bold">
+                                    {{ alg.capitalize() }}
+                                    {% if is_active %}
+                                        <span class="badge bg-primary-glow text-primary rounded-pill ms-2 py-1" style="font-size: 0.65rem;">Active</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-success fw-bold">${{ "{:,.2f}".format(data.revenue) }}</td>
+                                <td>{{ data.allocated }}</td>
+                                <td>{{ data.rejected }}</td>
+                                <td>{{ data.unused_mins }}m</td>
+                                <td class="text-info">{{ "{:.4f}".format(data.time_ms) }} ms</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-3 text-secondary small">
+                <i class="bi bi-lightbulb-fill text-warning me-1"></i>
+                <b>Knapsack DP</b> maximizes absolute revenue optimization, while <b>Greedy</b> minimizes execution run-times.
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Primary Visualization Charts Grid -->
+<div class="row g-4">
+    <!-- Chart 1: Revenue by Slot -->
+    <div class="col-md-6">
+        <div class="glass-card p-4">
+            <h5 class="fs-6 fw-bold mb-3"><i class="bi bi-cash-stack text-primary me-2"></i>Revenue Generated by Broadcasting Slot</h5>
+            <div class="chart-container" style="position: relative; height:280px;">
+                <canvas id="chartRevenueSlot"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart 2: Allocated vs Rejected Count -->
+    <div class="col-md-6">
+        <div class="glass-card p-4">
+            <h5 class="fs-6 fw-bold mb-3"><i class="bi bi-pie-chart text-primary me-2"></i>Allocation Yield Ratio</h5>
+            <div class="chart-container" style="position: relative; height:280px;">
+                <canvas id="chartAllocatedRatio"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart 3: Revenue Growth (Cumulative Curve) -->
+    <div class="col-md-6">
+        <div class="glass-card p-4">
+            <h5 class="fs-6 fw-bold mb-3"><i class="bi bi-graph-up-arrow text-primary me-2"></i>Cumulative Revenue Growth Curve</h5>
+            <div class="chart-container" style="position: relative; height:280px;">
+                <canvas id="chartRevenueGrowth"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart 4: Priority Distribution -->
+    <div class="col-md-6">
+        <div class="glass-card p-4">
+            <h5 class="fs-6 fw-bold mb-3"><i class="bi bi-bar-chart-steps text-primary me-2"></i>Priority Distribution Profile</h5>
+            <div class="chart-container" style="position: relative; height:280px;">
+                <canvas id="chartPriorityDist"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Render Charts -->
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+    // Extract metadata values injected from jinja context to draw graphs
+    const statsMetadata = {
+        slot_utilization_pct: {{ stats.slot_utilization_pct | tojson | safe }},
+        priority_dist: {{ stats.priority_dist | tojson | safe }},
+        allocated_count: {{ stats.allocated_count }},
+        rejected_count: {{ stats.rejected_count }}
+    };
+    
+    // Inject results and metadata variables for graphing
+    const comparisonsData = {{ comparisons | tojson | safe }};
+    const currentAlgorithm = "{{ current_algorithm }}";
+    const rawAdsData = {{ ads | tojson | safe }};
+    
+    document.addEventListener("DOMContentLoaded", function() {
+        initDashboardCharts(statsMetadata, comparisonsData, currentAlgorithm);
+    });
+</script>
+{% endblock %}

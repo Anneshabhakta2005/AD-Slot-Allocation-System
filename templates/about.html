@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Algorithm Info{% endblock %}
+{% block header_title %}Computational Theory &amp; Algorithms{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Left column: Quick Overview -->
+    <div class="col-lg-4">
+        <div class="glass-card p-4 h-100">
+            <h3 class="card-heading mb-3"><i class="bi bi-patch-question text-primary me-2"></i>Problem Statement</h3>
+            <p class="text-secondary small">
+                Media companies face the daily challenge of scheduling advertisements across television channels or digital platforms. Since broadcasting time is a strictly limited resource, and each advertisement varies in duration, budget value, priority, and preferred slot, selecting the optimal combination is an NP-hard optimization problem.
+            </p>
+            <p class="text-secondary small">
+                This system applies standard algorithms to maximize total revenue. The table below summarizes the theoretical characteristics of each algorithm:
+            </p>
+            
+            <div class="table-responsive border border-white border-opacity-10 rounded-3 mt-3">
+                <table class="table table-custom m-0 text-center" style="font-size: 0.8rem;">
+                    <thead>
+                        <tr>
+                            <th>Strategy</th>
+                            <th>Time Complexity</th>
+                            <th>Optimality</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="text-start fw-bold">Greedy</td>
+                            <td>O(N log N)</td>
+                            <td>Heuristic</td>
+                        </tr>
+                        <tr>
+                            <td class="text-start fw-bold">0/1 Knapsack</td>
+                            <td>O(N &times; W)</td>
+                            <td>Guaranteed</td>
+                        </tr>
+                        <tr>
+                            <td class="text-start fw-bold">WIS (Interval)</td>
+                            <td>O(N log N)</td>
+                            <td>Guaranteed</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right column: Algorithm Cards -->
+    <div class="col-lg-8">
+        <div class="d-flex flex-column gap-4">
+            <!-- Greedy Card -->
+            <div class="glass-card p-4">
+                <h3 class="card-heading mb-3"><i class="bi bi-lightning-charge text-primary me-2"></i>Greedy Scheduling Strategy</h3>
+                <p class="text-secondary">
+                    The Greedy Scheduling strategy uses a heuristic approach to arrange ads. It sorts the advertisement pool by multiple criteria in descending importance and schedules them sequentially:
+                </p>
+                <ol class="text-secondary small">
+                    <li><b>Highest Priority First:</b> High priority campaigns are given precedence.</li>
+                    <li><b>Highest Budget Second:</b> Ties in priority are broken by selecting the campaign yielding higher revenue.</li>
+                    <li><b>Smallest Duration Third:</b> Remaining ties are resolved by picking the shortest ad, leaving space for other campaigns.</li>
+                </ol>
+                <div class="p-3 rounded bg-white bg-opacity-5 border-start border-primary border-4 text-secondary small">
+                    <b>Strengths:</b> Extremely fast execution speed. Practical for massive datasets containing millions of campaigns.<br>
+                    <b>Weaknesses:</b> Does not guarantee the maximum possible revenue. Can leave significant slot time empty.
+                </div>
+            </div>
+
+            <!-- Knapsack DP Card -->
+            <div class="glass-card p-4">
+                <h3 class="card-heading mb-3"><i class="bi bi-calculator text-primary me-2"></i>0/1 Knapsack Dynamic Programming</h3>
+                <p class="text-secondary">
+                    By mapping the ad allocation challenge to the classical 0/1 Knapsack problem, the system determines the absolute mathematical maximum budget combination. The slot's broadcasting capacity (e.g. 180 minutes) represents the weight capacity, the advertisement durations represent item weights, and the budgets represent values.
+                </p>
+                <p class="text-secondary small">
+                    The recurrence relation solved by the dynamic programming solver is:
+                </p>
+                <div class="text-center bg-white bg-opacity-5 p-2 rounded font-monospace text-primary mb-3" style="font-size: 0.9rem;">
+                    dp[i][w] = max( dp[i-1][w], budget[i] + dp[i-1][w - duration[i]] )
+                </div>
+                <div class="p-3 rounded bg-white bg-opacity-5 border-start border-success border-4 text-secondary small">
+                    <b>Strengths:</b> Mathematically guarantees the absolute highest possible revenue allocation.<br>
+                    <b>Weaknesses:</b> Requires O(N &times; W) memory and runtime, which scales with slot capacity size and number of campaigns.
+                </div>
+            </div>
+
+            <!-- Weighted Interval Scheduling Card -->
+            <div class="glass-card p-4">
+                <h3 class="card-heading mb-3"><i class="bi bi-clock-history text-primary me-2"></i>Weighted Interval Scheduling (Bonus)</h3>
+                <p class="text-secondary">
+                    Unlike the Knapsack problem, which assumes ads can be shifted anywhere inside a slot, Weighted Interval Scheduling handles advertisements that specify strict start and end times. It finds the subset of mutually compatible (non-overlapping) intervals that yields the maximum possible total budget.
+                </p>
+                <p class="text-secondary small">
+                    The algorithm sorts intervals by end time $f_i$ and uses binary search to compute the predecessor array $p(j)$, which represents the latest compatible interval before $j$. The DP recurrence relation is:
+                </p>
+                <div class="text-center bg-white bg-opacity-5 p-2 rounded font-monospace text-primary mb-3" style="font-size: 0.9rem;">
+                    M[j] = max( M[j-1], budget[j] + M[p(j)] )
+                </div>
+                <div class="p-3 rounded bg-white bg-opacity-5 border-start border-info border-4 text-secondary small">
+                    <b>Strengths:</b> Optimizes fixed time intervals and prevents overlap conflicts. Runs in highly efficient O(N log N) time.<br>
+                    <b>Weaknesses:</b> Restricts flexibility since ads cannot shift times to fill empty capacity gaps.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

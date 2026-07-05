@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}User Guide{% endblock %}
+{% block header_title %}System Help Center &amp; Guidelines{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Left Column: User Guide & Slot Capacity -->
+    <div class="col-lg-6">
+        <div class="glass-card p-4 h-100">
+            <h3 class="card-heading mb-3"><i class="bi bi-book-half text-primary me-2"></i>User Guide</h3>
+            <p class="text-secondary small">
+                Follow these simple steps to run the Smart Advertisement Slot Allocation System:
+            </p>
+            <ol class="text-secondary small">
+                <li class="mb-2">Prepare a dataset text file matching the formatting specifications. You can copy or download sample datasets from this page.</li>
+                <li class="mb-2">Go to the <b>Upload & Run</b> page, drag & drop your `.txt` file into the upload area (or click to browse).</li>
+                <li class="mb-2">The system will validate your file in real time. If successful, the <b>Configure Allocation</b> panel unlocks, displaying dataset statistics.</li>
+                <li class="mb-2">Choose an allocation strategy (Greedy Scheduling, Knapsack Dynamic Programming, or Weighted Interval Scheduling) and click <b>Optimize & Allocate Slots</b>.</li>
+                <li class="mb-2">You will be redirected to the results panel, where you can search, sort, filter, and download CSV/PDF reports.</li>
+            </ol>
+            
+            <h4 class="card-heading fs-6 mt-4 mb-3"><i class="bi bi-clock text-primary me-2"></i>Slot Configurations</h4>
+            <div class="table-responsive border border-white border-opacity-10 rounded-3">
+                <table class="table table-custom m-0 text-center" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th>Slot Name</th>
+                            <th>Broadcasting Hours</th>
+                            <th>Capacity (Minutes)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="fw-bold">Morning</td>
+                            <td>09:00 - 12:00</td>
+                            <td>180 min</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Afternoon</td>
+                            <td>12:00 - 15:00</td>
+                            <td>180 min</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Evening</td>
+                            <td>17:00 - 21:00</td>
+                            <td>240 min</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">PrimeTime</td>
+                            <td>21:00 - 24:00</td>
+                            <td>180 min</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: FAQs & Copyable Datasets -->
+    <div class="col-lg-6">
+        <div class="glass-card p-4 mb-4">
+            <h3 class="card-heading mb-3"><i class="bi bi-code-square text-primary me-2"></i>Copyable Sample Datasets</h3>
+            
+            <!-- Tabs for standard vs interval data -->
+            <ul class="nav nav-tabs border-bottom border-white border-opacity-10 mb-3" id="sampleTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active bg-transparent text-secondary py-2 border-0" id="standard-tab" data-bs-toggle="tab" data-bs-target="#standard-sample" type="button" role="tab">Standard Format</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link bg-transparent text-secondary py-2 border-0" id="interval-tab" data-bs-toggle="tab" data-bs-target="#interval-sample" type="button" role="tab">Interval Format</button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="sampleTabContent">
+                <!-- Standard Tab -->
+                <div class="tab-pane fade show active" id="standard-sample" role="tabpanel">
+                    <p class="text-secondary small mb-2">Use this dataset format for Greedy and Knapsack scheduling:</p>
+                    <div class="position-relative">
+                        <pre class="bg-white bg-opacity-5 p-3 rounded text-primary font-monospace" style="font-size: 0.75rem; max-height: 180px; overflow-y: auto;" id="standardText">AdvertisementID,Duration,Budget,Priority,PreferredSlot
+AD001,30,5000,8,Morning
+AD002,45,8500,9,PrimeTime
+AD003,60,12000,7,Evening
+AD004,20,3500,5,Morning
+AD005,15,4000,6,Afternoon
+AD006,40,9000,8,Evening
+AD007,30,7500,9,PrimeTime
+AD008,50,6000,4,Afternoon
+AD009,25,4500,6,Morning
+AD010,15,3000,3,PrimeTime</pre>
+                        <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 py-0 px-2" onclick="copyText('standardText')"><i class="bi bi-copy"></i> Copy</button>
+                    </div>
+                </div>
+                
+                <!-- Interval Tab -->
+                <div class="tab-pane fade" id="interval-sample" role="tabpanel">
+                    <p class="text-secondary small mb-2">Use this format for Weighted Interval Scheduling:</p>
+                    <div class="position-relative">
+                        <pre class="bg-white bg-opacity-5 p-3 rounded text-primary font-monospace" style="font-size: 0.75rem; max-height: 180px; overflow-y: auto;" id="intervalText">AdvertisementID,Duration,Budget,Priority,PreferredSlot,StartTime,EndTime
+AD001,30,5000,8,Morning,09:00,09:30
+AD002,45,8500,9,PrimeTime,21:00,21:45
+AD003,60,12000,7,Evening,17:00,18:00
+AD004,20,3500,5,Morning,09:20,09:40
+AD005,15,4000,6,Afternoon,12:00,12:15
+AD006,40,9000,8,Evening,17:30,18:10
+AD007,30,7500,9,PrimeTime,21:30,22:00
+AD008,50,6000,4,Afternoon,12:10,13:00
+AD009,25,4500,6,Morning,09:40,10:05
+AD010,15,3000,3,PrimeTime,22:00,22:15</pre>
+                        <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 py-0 px-2" onclick="copyText('intervalText')"><i class="bi bi-copy"></i> Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FAQs -->
+        <div class="glass-card p-4">
+            <h3 class="card-heading mb-3"><i class="bi bi-patch-question text-primary me-2"></i>Frequently Asked Questions</h3>
+            
+            <div class="accordion accordion-flush" id="faqAccordion">
+                <div class="accordion-item bg-transparent border-bottom border-white border-opacity-10">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed bg-transparent text-white px-0 py-3 small" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            What validations are performed on the uploaded text dataset?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body px-0 text-secondary small">
+                            The system performs rigorous validation checking for: empty files, missing columns, duplicate advertisement IDs, non-numeric values in numeric columns, and negative durations/budgets/priorities. It also checks that preferred slot values exactly match one of the four configured slots (Morning, Afternoon, Evening, PrimeTime).
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item bg-transparent border-bottom border-white border-opacity-10">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed bg-transparent text-white px-0 py-3 small" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            How are intervals handled in Weighted Interval Scheduling if I didn't provide start and end times?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body px-0 text-secondary small">
+                            If you run the Weighted Interval Scheduling algorithm on a dataset lacking <code>StartTime</code> and <code>EndTime</code> columns, the system automatically generates deterministic, overlapping intervals within each advertisement's preferred slot. These intervals are generated using a seed based on the advertisement's ID, ensuring the results remain consistent across runs.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="accordion-item bg-transparent border-0">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed bg-transparent text-white px-0 py-3 small" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            Can I use duplicate Advertisement IDs?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body px-0 text-secondary small">
+                            No, advertisement IDs must be completely unique. If duplicate IDs are detected, the dataset validation will fail, and the system will notify you of the specific IDs that are repeated.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Copy helper
+    function copyText(elementId) {
+        const text = document.getElementById(elementId).innerText;
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Copied to clipboard successfully!");
+        }).catch(err => {
+            console.error("Failed to copy: ", err);
+        });
+    }
+</script>
+{% endblock %}
