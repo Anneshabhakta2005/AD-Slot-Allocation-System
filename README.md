@@ -1,3 +1,4 @@
+
 # Smart Advertisement Slot Allocation System
 
 An advanced, production-quality media optimization tool that schedules advertisements across TV channels or digital platforms to maximize total campaign revenue while satisfying slot capacities, priority requirements, and budget constraints.
