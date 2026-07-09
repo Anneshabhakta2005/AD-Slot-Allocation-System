@@ -2,7 +2,6 @@ import time
 from typing import Dict, Any
 from .greedy import run_greedy_allocation
 from .knapsack import run_knapsack_allocation
-from .interval import run_interval_allocation
 
 def run_allocation(ads_df, algorithm: str) -> Dict[str, Any]:
     """
@@ -17,8 +16,6 @@ def run_allocation(ads_df, algorithm: str) -> Dict[str, Any]:
         result = run_greedy_allocation(ads_df)
     elif algorithm == 'knapsack':
         result = run_knapsack_allocation(ads_df)
-    elif algorithm == 'interval':
-        result = run_interval_allocation(ads_df)
     else:
         raise ValueError(f"Unknown algorithm: {algorithm}")
     end_time = time.perf_counter()
@@ -70,27 +67,6 @@ def run_allocation(ads_df, algorithm: str) -> Dict[str, Any]:
             'allocated': k_res['metrics']['allocated_count'],
             'rejected': k_res['metrics']['rejected_count'],
             'unused_mins': k_res['metrics']['total_unused_time']
-        }
-        
-    # Interval comparison
-    if algorithm == 'interval':
-        comparisons['interval'] = {
-            'revenue': result['metrics']['total_revenue'],
-            'time_ms': execution_time_ms,
-            'allocated': result['metrics']['allocated_count'],
-            'rejected': result['metrics']['rejected_count'],
-            'unused_mins': result['metrics']['total_unused_time']
-        }
-    else:
-        st = time.perf_counter()
-        i_res = run_interval_allocation(ads_df)
-        et = time.perf_counter()
-        comparisons['interval'] = {
-            'revenue': i_res['metrics']['total_revenue'],
-            'time_ms': (et - st) * 1000.0,
-            'allocated': i_res['metrics']['allocated_count'],
-            'rejected': i_res['metrics']['rejected_count'],
-            'unused_mins': i_res['metrics']['total_unused_time']
         }
         
     result['comparisons'] = comparisons

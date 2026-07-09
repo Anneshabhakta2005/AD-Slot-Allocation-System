@@ -1,4 +1,5 @@
 from typing import List, Dict, Any
+# pyrefly: ignore [missing-import]
 import numpy as np
 from .parser import SLOT_CONFIGS
 

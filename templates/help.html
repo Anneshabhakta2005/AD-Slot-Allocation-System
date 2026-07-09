@@ -16,7 +16,7 @@
                 <li class="mb-2">Prepare a dataset text file matching the formatting specifications. You can copy or download sample datasets from this page.</li>
                 <li class="mb-2">Go to the <b>Upload & Run</b> page, drag & drop your `.txt` file into the upload area (or click to browse).</li>
                 <li class="mb-2">The system will validate your file in real time. If successful, the <b>Configure Allocation</b> panel unlocks, displaying dataset statistics.</li>
-                <li class="mb-2">Choose an allocation strategy (Greedy Scheduling, Knapsack Dynamic Programming, or Weighted Interval Scheduling) and click <b>Optimize & Allocate Slots</b>.</li>
+                <li class="mb-2">Choose an allocation strategy (Greedy Scheduling or Knapsack Dynamic Programming) and click <b>Optimize & Allocate Slots</b>.</li>
                 <li class="mb-2">You will be redirected to the results panel, where you can search, sort, filter, and download CSV/PDF reports.</li>
             </ol>
             
@@ -67,9 +67,7 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active bg-transparent text-secondary py-2 border-0" id="standard-tab" data-bs-toggle="tab" data-bs-target="#standard-sample" type="button" role="tab">Standard Format</button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link bg-transparent text-secondary py-2 border-0" id="interval-tab" data-bs-toggle="tab" data-bs-target="#interval-sample" type="button" role="tab">Interval Format</button>
-                </li>
+
             </ul>
             
             <div class="tab-content" id="sampleTabContent">
@@ -92,24 +90,7 @@ AD010,15,3000,3,PrimeTime</pre>
                     </div>
                 </div>
                 
-                <!-- Interval Tab -->
-                <div class="tab-pane fade" id="interval-sample" role="tabpanel">
-                    <p class="text-secondary small mb-2">Use this format for Weighted Interval Scheduling:</p>
-                    <div class="position-relative">
-                        <pre class="bg-white bg-opacity-5 p-3 rounded text-primary font-monospace" style="font-size: 0.75rem; max-height: 180px; overflow-y: auto;" id="intervalText">AdvertisementID,Duration,Budget,Priority,PreferredSlot,StartTime,EndTime
-AD001,30,5000,8,Morning,09:00,09:30
-AD002,45,8500,9,PrimeTime,21:00,21:45
-AD003,60,12000,7,Evening,17:00,18:00
-AD004,20,3500,5,Morning,09:20,09:40
-AD005,15,4000,6,Afternoon,12:00,12:15
-AD006,40,9000,8,Evening,17:30,18:10
-AD007,30,7500,9,PrimeTime,21:30,22:00
-AD008,50,6000,4,Afternoon,12:10,13:00
-AD009,25,4500,6,Morning,09:40,10:05
-AD010,15,3000,3,PrimeTime,22:00,22:15</pre>
-                        <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 py-0 px-2" onclick="copyText('intervalText')"><i class="bi bi-copy"></i> Copy</button>
-                    </div>
-                </div>
+
             </div>
         </div>
         
@@ -131,18 +112,7 @@ AD010,15,3000,3,PrimeTime,22:00,22:15</pre>
                     </div>
                 </div>
                 
-                <div class="accordion-item bg-transparent border-bottom border-white border-opacity-10">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed bg-transparent text-white px-0 py-3 small" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                            How are intervals handled in Weighted Interval Scheduling if I didn't provide start and end times?
-                        </button>
-                    </h2>
-                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-                        <div class="accordion-body px-0 text-secondary small">
-                            If you run the Weighted Interval Scheduling algorithm on a dataset lacking <code>StartTime</code> and <code>EndTime</code> columns, the system automatically generates deterministic, overlapping intervals within each advertisement's preferred slot. These intervals are generated using a seed based on the advertisement's ID, ensuring the results remain consistent across runs.
-                        </div>
-                    </div>
-                </div>
+
                 
                 <div class="accordion-item bg-transparent border-0">
                     <h2 class="accordion-header">

@@ -36,11 +36,7 @@
                             <td>O(N &times; W)</td>
                             <td>Guaranteed</td>
                         </tr>
-                        <tr>
-                            <td class="text-start fw-bold">WIS (Interval)</td>
-                            <td>O(N log N)</td>
-                            <td>Guaranteed</td>
-                        </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -85,23 +81,7 @@
                 </div>
             </div>
 
-            <!-- Weighted Interval Scheduling Card -->
-            <div class="glass-card p-4">
-                <h3 class="card-heading mb-3"><i class="bi bi-clock-history text-primary me-2"></i>Weighted Interval Scheduling (Bonus)</h3>
-                <p class="text-secondary">
-                    Unlike the Knapsack problem, which assumes ads can be shifted anywhere inside a slot, Weighted Interval Scheduling handles advertisements that specify strict start and end times. It finds the subset of mutually compatible (non-overlapping) intervals that yields the maximum possible total budget.
-                </p>
-                <p class="text-secondary small">
-                    The algorithm sorts intervals by end time $f_i$ and uses binary search to compute the predecessor array $p(j)$, which represents the latest compatible interval before $j$. The DP recurrence relation is:
-                </p>
-                <div class="text-center bg-white bg-opacity-5 p-2 rounded font-monospace text-primary mb-3" style="font-size: 0.9rem;">
-                    M[j] = max( M[j-1], budget[j] + M[p(j)] )
-                </div>
-                <div class="p-3 rounded bg-white bg-opacity-5 border-start border-info border-4 text-secondary small">
-                    <b>Strengths:</b> Optimizes fixed time intervals and prevents overlap conflicts. Runs in highly efficient O(N log N) time.<br>
-                    <b>Weaknesses:</b> Restricts flexibility since ads cannot shift times to fill empty capacity gaps.
-                </div>
-            </div>
+
         </div>
     </div>
 </div>

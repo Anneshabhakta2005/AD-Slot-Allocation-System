@@ -43,9 +43,7 @@
                     <button type="button" class="btn btn-sm btn-glass-secondary" onclick="generateSampleDataset(false)">
                         <i class="bi bi-file-earmark-text me-1"></i> Get Standard Sample
                     </button>
-                    <button type="button" class="btn btn-sm btn-glass-secondary" onclick="generateSampleDataset(true)">
-                        <i class="bi bi-clock-history me-1"></i> Get Interval Sample
-                    </button>
+
                 </div>
                 <div class="mt-2 text-muted small">
                     <i class="bi bi-info-circle me-1"></i> Downloads a mock campaign schedule with 50 items.
@@ -112,18 +110,7 @@
                             </div>
                         </div>
 
-                        <!-- Weighted Interval Scheduling Card -->
-                        <div class="algo-card p-3 mb-3 border border-white border-opacity-10 rounded-3 cursor-pointer" onclick="selectAlgo('interval')">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="algorithm" id="algo_interval" value="interval">
-                                <label class="form-check-label fw-bold d-block" for="algo_interval">
-                                    Weighted Interval Scheduling (Bonus)
-                                </label>
-                                <span class="text-secondary small d-block mt-1">
-                                    DP algorithm resolving overlapping intervals by end-times. Ideal when ads specify fixed Start/End times.
-                                </span>
-                            </div>
-                        </div>
+
                     </form>
                 {% else %}
                     <div class="text-center py-5">

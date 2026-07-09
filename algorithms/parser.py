@@ -34,23 +34,6 @@ SLOT_CONFIGS = {
     }
 }
 
-def parse_time_to_minutes(time_str):
-    """Parses a time string like '09:30' or '21:00' into minutes from midnight."""
-    try:
-        parts = time_str.strip().split(':')
-        if len(parts) != 2:
-            return None
-        hours = int(parts[0])
-        minutes = int(parts[1])
-        if not (0 <= hours <= 24 and 0 <= minutes < 60):
-            return None
-        # Handle 24:00 as midnight of the next day (1440 mins)
-        if hours == 24 and minutes == 0:
-            return 1440
-        return hours * 60 + minutes
-    except Exception:
-        return None
-
 def parse_and_validate_dataset(file_content: str):
     """
     Parses the dataset text content, validates against rules, and returns a Pandas DataFrame.
@@ -84,10 +67,6 @@ def parse_and_validate_dataset(file_content: str):
             rename_dict[col] = 'Priority'
         elif norm == 'preferredslot' or norm == 'slot':
             rename_dict[col] = 'PreferredSlot'
-        elif norm == 'starttime' or norm == 'start':
-            rename_dict[col] = 'StartTime'
-        elif norm == 'endtime' or norm == 'end':
-            rename_dict[col] = 'EndTime'
 
     df.rename(columns=rename_dict, inplace=True)
 
@@ -147,38 +126,4 @@ def parse_and_validate_dataset(file_content: str):
     if invalid_slots:
         raise ValueError(f"Invalid PreferredSlot value(s). Must be one of Morning, Afternoon, Evening, PrimeTime. Invalid records: {', '.join(invalid_slots[:10])}")
 
-    # Handle Optional StartTime and EndTime
-    if 'StartTime' in df.columns and 'EndTime' in df.columns:
-        df['StartTime'] = df['StartTime'].astype(str).str.strip()
-        df['EndTime'] = df['EndTime'].astype(str).str.strip()
-        
-        # Validate that if one is provided, both are, and validate format
-        for idx, row in df.iterrows():
-            st_str = row['StartTime']
-            et_str = row['EndTime']
-            
-            # Check for nan/empty
-            if pd.isna(st_str) or st_str == 'nan' or st_str == '' or pd.isna(et_str) or et_str == 'nan' or et_str == '':
-                # If they are missing, we will auto-generate them during algorithm setup if interval scheduling is selected
-                continue
-                
-            st_min = parse_time_to_minutes(st_str)
-            et_min = parse_time_to_minutes(et_str)
-            
-            if st_min is None or et_min is None:
-                raise ValueError(f"Invalid time format for {row['AdvertisementID']}. Use 'HH:MM' (e.g., '09:30').")
-                
-            if st_min >= et_min:
-                raise ValueError(f"Start time must be before End time for {row['AdvertisementID']}: {st_str} to {et_str}.")
-                
-            # Verify they fit in the preferred slot's window
-            slot = row['PreferredSlot']
-            config = SLOT_CONFIGS[slot]
-            
-            if st_min < config['start_min'] or et_min > config['end_min']:
-                raise ValueError(f"Interval {st_str}-{et_str} for {row['AdvertisementID']} does not fit within the {slot} slot bounds ({config['start_time']}-{config['end_time']}).")
-                
-            # Set duration based on start and end time if specified
-            df.at[idx, 'Duration'] = et_min - st_min
-            
     return df

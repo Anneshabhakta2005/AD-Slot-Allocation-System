@@ -42,10 +42,7 @@ This application is built as a modular Flask project with a modern, glassmorphic
 *   **Optimization Goal:** Maximizes total budget revenue.
 *   **Concept:** Maps slot capacities to weights and budgets to values. Guarantees the absolute mathematical optimal schedule combination for each slot.
 
-### 3. Weighted Interval Scheduling (Bonus)
-*   **Execution Time:** $O(N \log N)$
-*   **Conflict Resolution:** Schedules campaigns that specify fixed start and end times (`StartTime`, `EndTime`) using dynamic programming on compatibility arrays.
-*   **Concept:** Computes non-overlapping intervals yielding maximum budgets. Includes a hash-based generator for datasets missing explicit time boundaries.
+
 
 ---
 
@@ -63,7 +60,7 @@ AD Slot Allocation System/
 │   ├── parser.py               # Dataset CSV parser and input validator
 │   ├── greedy.py               # Greedy scheduling logic
 │   ├── knapsack.py             # 0/1 Knapsack dynamic programming solver
-│   ├── interval.py             # Weighted Interval Scheduling solver
+
 │   ├── allocator.py            # Orchestrator & benchmarking wrapper
 │   └── utils.py                # Math helpers & ReportLab PDF generator
 │
@@ -126,7 +123,7 @@ AD Slot Allocation System/
    ```
    http://127.0.0.1:5000
    ```
-3. Test using the testing tools on the main page to download sample standard or interval-based files.
+3. Test using the testing tools on the main page to download sample standard files.
 
 ---
 
@@ -143,21 +140,12 @@ python -m unittest discover -s tests -p "test_*.py"
 
 The uploaded dataset must be a comma-separated `.txt` file containing the following columns:
 
-### 1. Standard Dataset (Greedy & Knapsack)
 ```csv
 AdvertisementID,Duration,Budget,Priority,PreferredSlot
 AD001,30,5000,8,Morning
 AD002,45,8500,9,PrimeTime
 AD003,60,12000,7,Evening
 AD004,20,3500,5,Morning
-```
-
-### 2. Interval-based Dataset (Weighted Interval Scheduling)
-```csv
-AdvertisementID,Duration,Budget,Priority,PreferredSlot,StartTime,EndTime
-AD001,30,5000,8,Morning,09:00,09:30
-AD002,45,8500,9,PrimeTime,21:00,21:45
-AD003,60,12000,7,Evening,17:00,18:00
 ```
 *Note: Valid slot names are `Morning` (180m), `Afternoon` (180m), `Evening` (240m), and `PrimeTime` (180m).*
 

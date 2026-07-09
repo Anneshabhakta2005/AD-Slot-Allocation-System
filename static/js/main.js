@@ -374,59 +374,19 @@ function renderTable() {
 }
 
 // --- Deterministic Sample Dataset Generation ---
-function generateSampleDataset(isInterval = false) {
+function generateSampleDataset() {
     const slots = ['Morning', 'Afternoon', 'Evening', 'PrimeTime'];
-    let csvContent = "";
+    let csvContent = "AdvertisementID,Duration,Budget,Priority,PreferredSlot\n";
     
-    if (isInterval) {
-        csvContent = "AdvertisementID,Duration,Budget,Priority,PreferredSlot,StartTime,EndTime\n";
-        // Generate 50 items with start and end times fitting within constraints
-        const times = {
-            'Morning': { s: 540, e: 720 },     // 09:00 - 12:00
-            'Afternoon': { s: 720, e: 900 },   // 12:00 - 15:00
-            'Evening': { s: 1020, e: 1260 },  // 17:00 - 21:00
-            'PrimeTime': { s: 1260, e: 1440 }  // 21:00 - 24:00
-        };
+    // Generate 50 items
+    for (let i = 1; i <= 50; i++) {
+        const adId = `AD${String(i).padStart(3, '0')}`;
+        const duration = [15, 20, 30, 40, 45, 60][(i * 11) % 6];
+        const priority = (i % 10) + 1; // 1 to 10
+        const budget = duration * 180 + priority * 400 - (i % 3) * 150;
+        const slot = slots[i % slots.length];
         
-        for (let i = 1; i <= 50; i++) {
-            const adId = `AD${String(i).padStart(3, '0')}`;
-            const slot = slots[i % slots.length];
-            const tBounds = times[slot];
-            
-            // Random duration between 15 and 60 mins
-            const duration = [15, 20, 30, 45, 60][(i * 7) % 5];
-            const maxStart = tBounds.e - duration;
-            // Generate offset
-            const offset = (i * 13) % (maxStart - tBounds.s + 1);
-            const startMin = tBounds.s + offset;
-            const endMin = startMin + duration;
-            
-            const startH = Math.floor(startMin / 60);
-            const startM = startMin % 60;
-            const endH = Math.floor(endMin / 60);
-            const endM = endMin % 60;
-            
-            const startStr = `${String(startH).padStart(2, '0')}:${String(startM).padStart(2, '0')}`;
-            const endStr = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
-            
-            // Budget proportional to duration and priority
-            const priority = (i % 10) + 1; // 1 to 10
-            const budget = duration * 150 + priority * 300;
-            
-            csvContent += `${adId},${duration},${budget},${priority},${slot},${startStr},${endStr}\n`;
-        }
-    } else {
-        csvContent = "AdvertisementID,Duration,Budget,Priority,PreferredSlot\n";
-        // Generate 50 items
-        for (let i = 1; i <= 50; i++) {
-            const adId = `AD${String(i).padStart(3, '0')}`;
-            const duration = [15, 20, 30, 40, 45, 60][(i * 11) % 6];
-            const priority = (i % 10) + 1; // 1 to 10
-            const budget = duration * 180 + priority * 400 - (i % 3) * 150;
-            const slot = slots[i % slots.length];
-            
-            csvContent += `${adId},${duration},${budget},${priority},${slot}\n`;
-        }
+        csvContent += `${adId},${duration},${budget},${priority},${slot}\n`;
     }
     
     // Trigger browser local download
@@ -434,7 +394,7 @@ function generateSampleDataset(isInterval = false) {
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    link.setAttribute("download", isInterval ? "sample_interval_dataset.txt" : "sample_standard_dataset.txt");
+    link.setAttribute("download", "sample_standard_dataset.txt");
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
